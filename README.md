@@ -1,6 +1,7 @@
 Based on https://hub.docker.com/_/httpd/
 
 Default Oberon apache setup using PHP-FPM, requires a PHP-FPM docker image: official ones from PHP or the custom build one in our other repository.
+Note: If you don't need PHP (like only serving plain html) then we recommend using the vanilla HTTPD container or something lightweight like nginx/lighttpd.
 
 # This image has the following modules enabled:
 mod_alias
@@ -29,7 +30,7 @@ version: '3'
 services:
     web:
         container_name: "web-container"
-        image: oberonamsterdam/apache:latest
+        image: oberonamsterdam/apache24-fpm:latest
         restart: always
         network_mode: "bridge"
         environment:
