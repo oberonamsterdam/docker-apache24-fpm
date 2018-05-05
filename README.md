@@ -1,4 +1,5 @@
 Based on https://hub.docker.com/_/httpd/
+The "latest"-image is based on httpd:2.4-alpine
 
 Default Oberon apache setup using PHP-FPM, requires a PHP-FPM docker image: official ones from PHP or the custom build one in our other repository.
 Note: If you don't need PHP (like only serving plain html) then we recommend using the vanilla HTTPD container or something lightweight like nginx/lighttpd.
@@ -53,3 +54,45 @@ services:
 ```
 
 Switch PHP version by using another PHP image (exposed PHP-FPM on port 9000).
+
+# OPENID CONNECT
+
+The "openidc"-image is based on httpd:2.4 (since the mod_auth_openidc is not available for Alpine)
+
+Using the openidc-tagged image, use this for example to add an initial auth to your container (instead of htpasswd).
+Complete manual of openidc config can be found here: https://github.com/zmartzone/mod_auth_openidc
+
+This an example using google and your own domain (so only people from your own company can access this container)
+```
+LoadModule auth_openidc_module /usr/lib/apache2/modules/mod_auth_openidc.so
+
+OIDCProviderMetadataURL https://accounts.google.com/.well-known/openid-configuration
+OIDCClientID <<GOOGLE-CLIENT-ID>>
+OIDCClientSecret <<GOOGLE-CLIENT-SECRET>>
+
+OIDCAuthRequestParams hd=<<YOUR-DOMAIN>>
+OIDCRedirectURI https://${VIRTUAL_HOST}/redirect
+OIDCCryptoPassphrase <<YOUR-RANDOM-PASSPHRASE>>
+OIDCRemoteUserClaim email
+OIDCScope "openid email"
+OIDCAuthNHeader X-Forwarded-User
+
+<Location />
+    AuthType openid-connect
+    Require claim hd:<<YOUR-DOMAIN>>
+    Require valid-user
+</Location>
+```
+
+After this, add the config to the web-container:
+```
+version: '3'
+services:
+    web:
+        container_name: "web-container"
+        image: oberonamsterdam/apache24-fpm:openidc
+        volumes:
+            - .:/app/:delegated
+            - openidc.conf:/usr/local/apache/config/other/openidc.conf
+
+```
