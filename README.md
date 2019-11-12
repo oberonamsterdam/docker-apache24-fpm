@@ -31,7 +31,6 @@ Note that HTTPS is disabled since we use an Nginx proxy ourselves so don't forge
 version: '3'
 services:
     web:
-        container_name: "web-container"
         image: oberonamsterdam/apache24-fpm:latest
         restart: always
         network_mode: "bridge"
@@ -45,8 +44,7 @@ services:
         volumes:
             - .:/app/:delegated
     php:
-        container_name: "php-container"
-        image: jiechin/php:7.1-fpm
+        image: oberonamsterdam/php:7.1-fpm
         restart: always
         network_mode: "bridge"
         volumes:
@@ -89,7 +87,6 @@ After this, add the config to the web-container:
 version: '3'
 services:
     web:
-        container_name: "web-container"
         image: oberonamsterdam/apache24-fpm:openidc
         volumes:
             - .:/app/:delegated
