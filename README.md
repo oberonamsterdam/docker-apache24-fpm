@@ -53,6 +53,23 @@ services:
 
 Switch PHP version by using another PHP image (exposed PHP-FPM on port 9000).
 
+# Switch PHP container hostname or portnumber
+
+You can use the PHP_FPM_HOSTNAME and PHP_FPM_PORT environment variables to change the hostname and
+port Apache uses to connect to PHP-FPM:
+
+```
+version: '3'
+services:
+    web:
+        ...SNIP
+        environment:
+            - "VIRTUAL_HOST=my.domain.ext"
+            - "APACHE_DOCUMENTROOT=/app/web"
+            - "PHP_FPM_HOSTNAME=my_php_container"
+            - "PHP_FPM_PORT=9001"
+```
+
 # OPENID CONNECT
 
 The "openidc"-image is based on httpd:2.4 (since the mod_auth_openidc is not available for Alpine)
